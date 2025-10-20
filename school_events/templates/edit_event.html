@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Event{% endblock %}
+
+{% block content %}
+<div class="edit-event">
+    <h1>Edit Event</h1>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="name">Event Name</label>
+            <input type="text" id="name" name="name" value="{{ event.name }}" required>
+        </div>
+        <div class="form-group">
+            <label for="date">Event Date and Time</label>
+            <input type="datetime-local" id="date" name="date"
+                   value="{{ event.date.strftime('%Y-%m-%dT%H:%M') }}" required step="900" min="2025-01-01T00:00" onchange="validateDate(this)">
+            <script>
+                function validateDate(input) {
+                    const selectedDate = new Date(input.value);
+                    if (selectedDate.getFullYear() < 2025) {
+                        alert('Event year cannot be earlier than 2025');
+                        input.value = '{{ event.date.strftime('%Y-%m-%dT%H:%M') }}';  // Restore original value
+                    }
+                }
+            </script>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" required>{{ event.description }}</textarea>
+        </div>
+        <div class="form-actions">
+            <label class="show-students-toggle">
+                <input type="checkbox" id="showStudents" onchange="toggleStudentList()">
+                Show Registered Students
+            </label>
+            <div class="button-group">
+                <button type="submit" class="button">Save Changes</button>
+                <a href="{{ url_for('admin_events') }}" class="button secondary">Cancel</a>
+            </div>
+        </div>
+    </form>
+
+    <div id="studentList" class="student-list" style="display: none;">
+        <h2>Registered Students</h2>
+        {% if event.registrations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Registration Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in event.registrations %}
+                <tr>
+                    <td>{{ registration.user.display_name }}</td>
+                    <td>{{ registration.registration_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-students">No students registered for this event yet.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleStudentList() {
+            const checkbox = document.getElementById('showStudents');
+            const studentList = document.getElementById('studentList');
+            studentList.style.display = checkbox.checked ? 'block' : 'none';
+        }
+    </script>
+</div>
+{% endblock %}

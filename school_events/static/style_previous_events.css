@@ -1,0 +1,53 @@
+/* Previous Events Section Styles */
+.previous-events-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #eee;
+}
+
+.previous-events-controls {
+    margin-bottom: 1.5rem;
+}
+
+.deletion-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.enable-deletion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #d32f2f;
+    font-weight: 500;
+}
+
+.enable-deletion input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.warning-text {
+    color: #d32f2f;
+    font-size: 0.85em;
+    max-width: 450px;
+    margin-left: 24px;
+    line-height: 1.4;
+}
+
+.deletion-disabled {
+    opacity: 0.5;
+}
+
+.deletion-disabled:disabled {
+    cursor: not-allowed;
+}
+
+.previous-events {
+    background-color: #fafafa;
+    border-radius: 5px;
+    padding: 1rem;
+}

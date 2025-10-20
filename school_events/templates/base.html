@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="300">
+    <title>SPŠD školní akce - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='settings.css') }}">
+    <script>
+        // Theme management
+        function initTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton();
+        }
+        
+        function updateThemeButton() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const button = document.getElementById('themeToggle');
+            if (button) {
+                button.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+            }
+        }
+        
+        // Initialize theme before page loads
+        initTheme();
+        
+        // Preserve scroll position after refresh
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('scrollPosition')) {
+                window.scrollTo(0, localStorage.getItem('scrollPosition'));
+            }
+            updateThemeButton();
+        });
+
+        window.onscroll = function() {
+            localStorage.setItem('scrollPosition', window.pageYOffset);
+        };
+        
+        // Toggle settings dropdown
+        function toggleSettings() {
+            const dropdown = document.getElementById('settingsDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.settings-btn')) {
+                const dropdowns = document.getElementsByClassName('settings-dropdown-content');
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="{{ url_for('index') }}">SPŠD školní akce</a></div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">Events</a>
+            <a href="{{ url_for('students') }}">Students</a>
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_events') }}">Manage Events</a>
+                    <a href="{{ url_for('admin_registrations') }}">Registrations</a>
+                {% endif %}
+                <span class="username">{{ current_user.display_name }}</span>
+            {% endif %}
+            
+            <!-- Settings Dropdown -->
+            <div class="settings-dropdown">
+                <button onclick="toggleSettings()" class="settings-btn">⚙️</button>
+                <div id="settingsDropdown" class="settings-dropdown-content">
+                    <div class="settings-section">
+                        <h4>Theme</h4>
+                        <button id="themeToggle" onclick="toggleTheme()" class="settings-option">
+                            🌙 Dark Mode
+                        </button>
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <div class="settings-section">
+                                <h4>Admin Settings</h4>
+                                <div class="deletion-controls-settings">
+                                    <label class="enable-deletion">
+                                        <input type="checkbox" id="enableDeletion" onchange="toggleDeletionButtons()">
+                                        Enable event deletion
+                                    </label>
+                                    <small class="warning-text-settings">⚠️ Deleting events will permanently remove all associated records.</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="settings-section">
+                            <h4>Account</h4>
+                            <a href="{{ url_for('logout') }}" class="settings-option logout-btn">🚪 Logout</a>
+                        </div>
+                    {% else %}
+                        <div class="settings-section">
+                            <h4>Account</h4>
+                            <a href="{{ url_for('login') }}" class="settings-option">🔑 Login</a>
+                            <a href="{{ url_for('register') }}" class="settings-option">📝 Register</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script>
+    // Handle attendance toggle
+    function toggleAttendance(checkbox) {
+        const container = checkbox.closest('.attendance-toggle');
+        const registrationId = container.dataset.registrationId;
+        const statusText = container.querySelector('.status-text');
+        
+        fetch(`/admin/toggle_attendance/${registrationId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                statusText.textContent = data.attended ? '✓ Attended' : 'Not Attended';
+                statusText.className = `status-text ${data.attended ? 'attended' : 'not-attended'}`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            checkbox.checked = !checkbox.checked; // Revert the checkbox state
+        });
+    }
+
+    // Handle datetime inputs to enforce 24-hour format across browsers
+    document.addEventListener('DOMContentLoaded', function() {
+        const timeInputs = document.querySelectorAll('input[type="datetime-local"]');
+        
+        // Detect browser
+        const isChrome = /Chrome/.test(navigator.userAgent);
+        const isFirefox = /Firefox/.test(navigator.userAgent);
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+        const isEdge = /Edg/.test(navigator.userAgent);
+
+        timeInputs.forEach(input => {
+            // Apply browser-specific attributes
+            if (isChrome || isEdge) {
+                input.setAttribute('data-form-type', 'time');
+            }
+            if (isFirefox) {
+                input.setAttribute('data-time-format', '24');
+            }
+            if (isSafari) {
+                input.setAttribute('data-time-format', 'HH:mm');
+            }
+
+            // Set HTML attributes for better browser compatibility
+            input.setAttribute('pattern', '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}');
+            input.setAttribute('step', '900'); // 15-minute intervals
+            
+            // Universal 24-hour format converter
+            const enforce24HourFormat = (value) => {
+                if (!value) return '';
+                try {
+                    const date = new Date(value.replace(' ', 'T')); // Handle space between date and time
+                    if (isNaN(date.getTime())) return value;
+                    
+                    let hours = date.getHours();
+                    const isPM = value.toLowerCase().includes('pm');
+                    const isAM = value.toLowerCase().includes('am');
+                    
+                    // Convert from 12-hour to 24-hour format if needed
+                    if (isPM && hours < 12) hours += 12;
+                    if (isAM && hours === 12) hours = 0;
+                    
+                    // Format date components
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const formattedHours = String(hours).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    
+                    return `${year}-${month}-${day}T${formattedHours}:${minutes}`;
+                } catch (e) {
+                    console.error('Date parsing error:', e);
+                    return value;
+                }
+            };
+
+            // Event handlers for different browsers
+            const updateValue = (e) => {
+                const newValue = enforce24HourFormat(e.target.value);
+                if (newValue !== e.target.value) {
+                    e.target.value = newValue;
+                }
+            };
+
+            // Handle direct input
+            input.addEventListener('input', updateValue);
+            
+            // Handle calendar picker selection
+            input.addEventListener('change', updateValue);
+            
+            // Clean up on focus/blur
+            input.addEventListener('focus', function() {
+                if (this.value) {
+                    this.value = enforce24HourFormat(this.value);
+                }
+            });
+
+            // Special handling for browsers that show AM/PM picker
+            input.addEventListener('keydown', function(e) {
+                if (e.key.toLowerCase() === 'a' || e.key.toLowerCase() === 'p') {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

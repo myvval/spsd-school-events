@@ -1,0 +1,136 @@
+/* Settings Dropdown Styles */
+.settings-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.settings-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+}
+
+.settings-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.settings-dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: var(--card-bg);
+    min-width: 300px;
+    box-shadow: 0 8px 32px var(--shadow-color);
+    border-radius: 15px;
+    z-index: 1001;
+    margin-top: 0.5rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+}
+
+.settings-dropdown-content.show {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.settings-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.settings-option {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.settings-option:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    transform: translateX(5px);
+}
+
+.settings-option:last-child {
+    margin-bottom: 0;
+}
+
+.logout-btn {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: #ff6b6b;
+}
+
+.deletion-controls-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.deletion-controls-settings .enable-deletion {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #d32f2f;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.deletion-controls-settings input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #d32f2f;
+}
+
+.warning-text-settings {
+    color: #d32f2f;
+    font-size: 0.8em;
+    line-height: 1.4;
+    display: block;
+    padding-left: 1.95rem;
+}

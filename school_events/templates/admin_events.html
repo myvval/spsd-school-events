@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Events{% endblock %}
+
+{% block content %}
+<div class="admin-events">
+    <h1>📅 Správa akcí</h1>
+    
+    <div class="admin-content-wrapper">
+        <!-- CREATE NEW EVENT CATEGORY -->
+        <div class="admin-category create-event-category">
+        <div class="category-header">
+            <h2>➕ Vytvořit novou akci</h2>
+        </div>
+        <div class="category-content">
+            <form method="POST" action="{{ url_for('create_event') }}" class="event-form-grid">
+                <div class="form-group">
+                    <label for="name">📝 Název akce</label>
+                    <input type="text" id="name" name="name" required placeholder="Např. Školní výlet, Sportovní den...">
+                </div>
+                <div class="form-group">
+                    <label for="date">📅 Datum a čas</label>
+                    <input type="datetime-local" id="date" name="date" required step="900" min="2025-01-01T00:00" onchange="validateDate(this)">
+                </div>
+                <script>
+                    function validateDate(input) {
+                        const selectedDate = new Date(input.value);
+                        if (selectedDate.getFullYear() < 2025) {
+                            alert('Rok akce nemůže být starší než 2025');
+                            input.value = '';
+                        }
+                    }
+                </script>
+                <div class="form-group form-group-full">
+                    <label for="description">📄 Popis</label>
+                    <textarea id="description" name="description" rows="4" required placeholder="Zadejte podrobný popis akce..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="button btn-create">✓ Vytvořit akci</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DELETION CONTROLS (GLOBAL) -->
+    <div class="admin-category deletion-controls-category">
+        <div class="category-header">
+            <h2>🔒 Nastavení mazání</h2>
+        </div>
+        <div class="category-content">
+            <div class="deletion-controls-box">
+                <div class="deletion-controls">
+                    <label class="enable-deletion">
+                        <input type="checkbox" id="enableDeletion" onchange="toggleDeletionButtons()">
+                        <span>🔓 Povolit mazání akcí</span>
+                    </label>
+                    <small class="warning-text">Upozornění: Mazání akcí trvale odstraní všechny přihlášky a záznamy o účasti.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CURRENT EVENTS CATEGORY -->
+    <div class="admin-category current-events-category">
+        <div class="category-header">
+            <h2>🎯 Nadcházející akce</h2>
+            <span class="event-count">{{ current_events|length }} akcí</span>
+        </div>
+        <div class="category-content">
+            <div class="events-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Název akce</th>
+                            <th>Datum a čas</th>
+                            <th>Přihlášení</th>
+                            <th>Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if current_events %}
+                            {% for event in current_events %}
+                            <tr>
+                                <td class="event-name-cell">
+                                    <strong>{{ event.name }}</strong>
+                                </td>
+                                <td class="event-date-cell">{{ event.formatted_date }}</td>
+                                <td class="event-reg-cell">
+                                    <span class="registration-badge">{{ event.registrations|length }} studentů</span>
+                                </td>
+                                <td class="actions-cell">
+                                    <a href="{{ url_for('edit_event', event_id=event.id) }}" class="button small btn-edit">✏️ Upravit</a>
+                                    <form method="POST" action="{{ url_for('delete_event', event_id=event.id) }}" style="display: inline;">
+                                        <button type="submit" class="button small delete deletion-disabled btn-delete" onclick="return validateDelete(this)" disabled>🗑️ Smazat</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="no-events">Žádné nadcházející akce</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIOUS EVENTS CATEGORY -->
+    <div class="admin-category previous-events-category">
+        <div class="category-header">
+            <h2>📚 Minulé akce</h2>
+            <span class="event-count">{{ previous_events|length }} akcí</span>
+        </div>
+        <div class="category-content">
+            <div class="events-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Název akce</th>
+                            <th>Datum a čas</th>
+                            <th>Přihlášení</th>
+                            <th>Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if previous_events %}
+                            {% for event in previous_events %}
+                            <tr>
+                                <td class="event-name-cell">
+                                    <strong>{{ event.name }}</strong>
+                                </td>
+                                <td class="event-date-cell">{{ event.formatted_date }}</td>
+                                <td class="event-reg-cell">
+                                    <span class="registration-badge">{{ event.registrations|length }} studentů</span>
+                                </td>
+                                <td class="actions-cell">
+                                    <a href="{{ url_for('edit_event', event_id=event.id) }}" class="button small btn-view">👁️ Zobrazit</a>
+                                    <form method="POST" action="{{ url_for('delete_event', event_id=event.id) }}" style="display: inline;">
+                                        <button type="submit" class="button small delete deletion-disabled btn-delete" onclick="return validateDelete(this)" disabled>🗑️ Smazat</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="no-events">Žádné minulé akce</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDeletionButtons() {
+            const checkbox = document.getElementById('enableDeletion');
+            const deleteButtons = document.querySelectorAll('.deletion-disabled');
+            
+            deleteButtons.forEach(button => {
+                button.disabled = !checkbox.checked;
+                if (checkbox.checked) {
+                    button.classList.add('deletion-enabled');
+                } else {
+                    button.classList.remove('deletion-enabled');
+                }
+            });
+        }
+
+        function validateDelete(button) {
+            // This function should only be called when button is enabled
+            return confirm('Warning: This will permanently delete the event and all associated records. Are you sure you want to proceed?');
+        }
+    </script>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Studenti{% endblock %}
+
+{% block content %}
+<!-- React Component Mount Point -->
+<div id="students-react-root"></div>
+
+<!-- Load React from CDN -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='react-styles.css') }}">
+<script src="{{ url_for('static', filename='js/students-react.js') }}"></script>
+
+<script>
+// Initialize React component
+const root = ReactDOM.createRoot(document.getElementById('students-react-root'));
+root.render(React.createElement(StudentsList));
+</script>
+
+<!-- Keep original table below React component for reference -->
+<details style="margin-top: 3rem;">
+<summary style="cursor: pointer; padding: 1rem; background: var(--card-bg); border-radius: 10px; font-weight: 600;">
+    Zobrazit detailní tabulku s účastí na akcích
+</summary>
+<div class="students-list" style="margin-top: 1rem;">
+    <h2>Detailní tabulka s účastí</h2>
+    <div class="table-responsive">
+        <table class="students-table">
+            <thead>
+                <tr>
+                    <th class="student-name">Jméno studenta</th>
+                    {% for event in events %}
+                    <th class="event-column">{{ event.name }}<br>
+                        <span class="event-date">{{ event.date.strftime('%d.%m.%Y %H:%M').replace('0', '', 1) if event.date.strftime('%H')[0] == '0' else event.date.strftime('%d.%m.%Y %H:%M') }}</span>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td class="student-name">{{ student.display_name }}</td>
+                    {% for event in events %}
+                    <td class="status-cell">
+                        {% if student_matrix[student.id][event.id]['registered'] %}
+                            <div class="status-container">
+                                {% if current_user.is_admin %}
+                                    <div class="attendance-toggle" 
+                                         data-registration-id="{{ student_matrix[student.id][event.id]['registration_id'] }}"
+                                         data-attended="{{ 'true' if student_matrix[student.id][event.id]['attended'] else 'false' }}">
+                                        <label class="switch">
+                                            <input type="checkbox" 
+                                                   {% if student_matrix[student.id][event.id]['attended'] %}checked{% endif %}
+                                                   onchange="toggleAttendance(this)">
+                                            <span class="slider round"></span>
+                                        </label>
+                                        <span class="status-text {{ 'attended' if student_matrix[student.id][event.id]['attended'] else 'not-attended' }}">
+                                            {{ 'Zúčastněn' if student_matrix[student.id][event.id]['attended'] else 'Nezúčastněn' }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <span class="status {{ 'attended' if student_matrix[student.id][event.id]['attended'] else 'registered' }}">
+                                        {{ 'Zúčastněn' if student_matrix[student.id][event.id]['attended'] else 'Přihlášen' }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <span class="status not-registered">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</details>
+{% endblock %}

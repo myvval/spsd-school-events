@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Registrations{% endblock %}
+
+{% block content %}
+<div class="admin-registrations">
+    <h1>Event Registrations</h1>
+    
+    <div class="search-bar">
+        <form action="{{ url_for('admin_registrations') }}" method="get" class="filter-form" id="filterForm">
+            <div class="filter-group">
+                <input type="text" name="query" placeholder="Search by student name..." value="{{ query }}" oninput="applyFilters()">
+                <select name="event" id="eventSelect" onchange="applyFilters()">
+                    <option value="">All Events</option>
+                    {% for event in events %}
+                        <option value="{{ event.id }}" {% if selected_event|string == event.id|string %}selected{% endif %}>
+                            {{ event.name }} ({{ event.formatted_date }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let filterTimeout;
+        
+        function applyFilters() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                document.getElementById('filterForm').submit();
+            }, 300);
+        }
+    </script>
+
+    <div class="registrations-list">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Event</th>
+                    <th>Registration Date</th>
+                    <th>Attendance</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registration in registrations %}
+                <tr>
+                    <td>{{ registration.user.display_name }}</td>
+                                        <td>{{ registration.event.name }} ({{ registration.event.date.strftime('%d.%m.%Y %H:%M').replace('0', '', 1) if registration.event.date.strftime('%H')[0] == '0' else registration.event.date.strftime('%d.%m.%Y %H:%M') }})</td>
+                    <td>{{ registration.registration_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ 'Present' if registration.attended else 'Absent' }}</td>
+                    <td>
+                        <a href="{{ url_for('toggle_attendance', registration_id=registration.id) }}" class="button small">
+                            {{ 'Mark Absent' if registration.attended else 'Mark Present' }}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
