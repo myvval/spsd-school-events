@@ -58,6 +58,47 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    text-decoration-skip-ink: none;
+}
+
+/* Remove all wavy underlines from inputs and selects */
+input,
+select,
+textarea,
+option {
+    text-decoration: none !important;
+    -webkit-text-decoration: none !important;
+    text-decoration-line: none !important;
+    text-decoration-style: none !important;
+    -webkit-text-decoration-line: none !important;
+    -webkit-text-decoration-style: none !important;
+    -moz-text-decoration-line: none !important;
+    -moz-text-decoration-style: none !important;
+    text-decoration-color: transparent !important;
+    -webkit-text-decoration-color: transparent !important;
+}
+
+/* Specifically target select and option elements */
+select,
+select option,
+select:focus,
+select option:hover,
+select option:focus,
+select option:checked {
+    text-decoration: none !important;
+    -webkit-text-decoration: none !important;
+    background-image: none;
+    text-decoration-skip-ink: none !important;
+}
+
+/* Disable grammar and spell check underlines */
+input[type="text"],
+input[type="search"],
+textarea {
+    -webkit-text-decoration-skip: none !important;
+    text-decoration-skip: none !important;
+    text-decoration-skip-ink: none !important;
+    -webkit-text-decoration-skip-ink: none !important;
 }
 
 body {
@@ -91,12 +132,47 @@ body {
 }
 
 .nav-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    background: linear-gradient(45deg, #fff, #a8dadc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    display: flex;
+    align-items: center;
+}
+
+.brand-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    pointer-events: none;
+}
+
+.brand-logo {
+    height: 100px;
+    width: auto;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.school-name {
+    font-size: 1rem;
+    line-height: 1.2;
+    color: white;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.event-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .nav-brand a {
@@ -146,6 +222,30 @@ body {
     box-shadow: 0 8px 32px var(--shadow-color);
     border: 1px solid var(--border-color);
     animation: fadeInUp 0.5s ease;
+}
+
+.auth-form h1 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.auth-form p {
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-form p a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-form p a:hover {
+    color: #2563eb;
+    text-decoration: underline;
 }
 
 @keyframes fadeInUp {
@@ -349,14 +449,28 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 .filter-group input[type="text"],
 .filter-group select {
     padding: 0.5rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--input-border);
     border-radius: 3px;
     font-size: 1rem;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    text-decoration: none;
 }
 
 .filter-group input[type="text"] {
     flex: 1;
     min-width: 200px;
+    padding-left: 2.5rem;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-size: 16px 16px;
+}
+
+.filter-group input[type="text"]::placeholder {
+    color: var(--text-light);
+    padding-left: 0;
+    text-decoration: none;
 }
 
 .filter-group select {
@@ -366,6 +480,7 @@ input[type="datetime-local"]::-webkit-datetime-edit {
     -webkit-appearance: menulist;
     -moz-appearance: menulist;
     appearance: menulist;
+    text-decoration: none;
 }
 
 .select-help {
@@ -409,21 +524,18 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 }
 
 .events-section {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px var(--shadow-color);
+    border: 1px solid var(--border-color);
 }
 
 .events-section h2 {
     margin-bottom: 1.5rem;
-    color: #333;
+    color: var(--text-primary);
     font-size: 1.8rem;
-    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 /* Previous Events Layout */
@@ -435,7 +547,7 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 
 .events-section .events-table {
     flex: 1;
-    background-color: #fafafa;
+    background: var(--card-bg);
     border-radius: 5px;
     padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -445,9 +557,9 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 .previous-events-controls {
     width: 250px;
     padding: 1.5rem;
-    background-color: #f8f9fa;
+    background: var(--card-bg);
     border-radius: 5px;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--border-color);
 }
 
 .deletion-controls-container {
@@ -521,13 +633,14 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 .events-section td {
     padding: 0.75rem;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .events-section th {
     font-weight: 600;
-    background-color: #f4f4f4;
-    color: #333;
+    background: var(--table-header-bg);
+    color: white;
 }
 
 /* Responsive design for mobile */
@@ -544,7 +657,7 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 
 .previous-events {
     margin-top: 1rem;
-    background-color: #fafafa;
+    background: var(--card-bg);
     border-radius: 5px;
     padding: 1rem;
 }
@@ -637,7 +750,7 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 .edit-event {
     max-width: 800px;
     margin: 2rem auto;
-    background: white;
+    background: var(--card-bg);
     padding: 2rem;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -814,7 +927,7 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 }
 
 .event-card h3 {
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 1rem;
     font-size: 1.4rem;
 }
@@ -835,7 +948,7 @@ input[type="datetime-local"]::-webkit-datetime-edit {
 .event-description {
     margin-bottom: 1rem;
     flex-grow: 1;
-    color: #555;
+    color: var(--text-secondary);
     line-height: 1.6;
 }
 
@@ -845,9 +958,9 @@ table {
     border-collapse: separate;
     border-spacing: 0;
     margin-top: 1rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--card-bg);
     backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px var(--shadow-color);
     border-radius: 15px;
     overflow: hidden;
 }
@@ -855,11 +968,12 @@ table {
 th, td {
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 th {
-    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    background: var(--table-header-bg);
     color: white;
     font-weight: 600;
     text-transform: uppercase;
@@ -872,7 +986,7 @@ tr {
 }
 
 tr:hover {
-    background: rgba(59, 130, 246, 0.05);
+    background: var(--table-hover-bg);
     transform: scale(1.01);
 }
 
@@ -932,7 +1046,7 @@ tr:hover {
 .students-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--card-bg);
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     table-layout: auto;
 }
@@ -941,18 +1055,21 @@ tr:hover {
 .students-table td {
     padding: 0.75rem;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-color);
     font-size: 0.9rem;
+    color: var(--text-primary);
 }
 
 .students-table th {
-    background-color: #f8f9fa;
+    background: var(--table-header-bg);
     font-weight: bold;
+    color: white;
 }
 
 .student-name {
     min-width: 150px;
     font-weight: bold;
+    color: var(--text-primary);
 }
 
 .event-column {
@@ -961,7 +1078,7 @@ tr:hover {
 
 .event-date {
     font-size: 0.8em;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .status {
@@ -1223,6 +1340,8 @@ textarea {
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.3s ease;
+    text-decoration: none !important;
+    -webkit-text-decoration: none !important;
 }
 
 input[type="text"]:focus,
@@ -1236,7 +1355,14 @@ select:focus,
 textarea:focus {
     border-color: var(--input-focus-border);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Specific focus styling for filter/search inputs only */
+.filter-group input[type="text"]:focus,
+.filter-group select:focus,
+.search-bar input:focus {
+    box-shadow: none;
+    outline: none;
 }
 
 /* Placeholder color for dark theme */

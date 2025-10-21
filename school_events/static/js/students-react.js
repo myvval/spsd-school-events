@@ -82,13 +82,20 @@ function StudentsList() {
   return React.createElement('div', { className: 'students-container' },
     React.createElement('div', { className: 'students-header' },
       React.createElement('div', { className: 'search-box' },
-        React.createElement('span', { className: 'search-icon' }, '🔍'),
         React.createElement('input', {
           type: 'text',
-          placeholder: 'Hledat studenta podle jména nebo uživatelského jména...',
+          placeholder: 'Hledat studenta...',
           value: searchTerm,
           onChange: (e) => setSearchTerm(e.target.value),
-          className: 'search-input'
+          className: 'search-input',
+          spellCheck: 'false',
+          autoComplete: 'off',
+          autoCorrect: 'off',
+          autoCapitalize: 'off',
+          'data-gramm': 'false',
+          'data-gramm_editor': 'false',
+          'data-enable-grammarly': 'false',
+          style: { paddingLeft: '2.5rem' }
         }),
         searchTerm && React.createElement('button', {
           className: 'clear-search',

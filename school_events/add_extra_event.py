@@ -1,5 +1,5 @@
 from app import app, db, Event, Registration, User
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 
 def add_extra_event():
@@ -20,12 +20,10 @@ def add_extra_event():
         for student in students:
             # 70% chance of registering
             if random.random() < 0.7:
-                # If registered, 80% chance of attending
-                attended = random.random() < 0.8
                 registration = Registration(
                     user_id=student.id,
                     event_id=new_event.id,
-                    attended=attended,
+                    attended=False,
                     registration_date=datetime.now()
                 )
                 db.session.add(registration)

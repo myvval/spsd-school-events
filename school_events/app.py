@@ -229,18 +229,6 @@ def edit_event(event_id):
     
     return render_template('edit_event.html', event=event)
 
-@app.route('/admin/events/<int:event_id>/delete', methods=['POST'])
-@login_required
-def delete_event(event_id):
-    if not current_user.is_admin:
-        return redirect(url_for('index'))
-    
-    event = Event.query.get_or_404(event_id)
-    db.session.delete(event)
-    db.session.commit()
-    flash('Event deleted successfully!')
-    return redirect(url_for('admin_events'))
-
 @app.route('/admin/registrations')
 @login_required
 def admin_registrations():
@@ -288,8 +276,8 @@ def api_events():
     from datetime import datetime
     now = datetime.now()
     
-    current_events = Event.query.filter(Event.date >= now.date()).order_by(Event.date, Event.time).all()
-    previous_events = Event.query.filter(Event.date < now.date()).order_by(Event.date.desc(), Event.time.desc()).all()
+    current_events = Event.query.filter(Event.date >= now.date()).order_by(Event.date).all()
+    previous_events = Event.query.filter(Event.date < now.date()).order_by(Event.date.desc()).all()
     
     def event_to_dict(event):
         registered_count = Registration.query.filter_by(event_id=event.id).count()
@@ -302,12 +290,9 @@ def api_events():
         
         return {
             'id': event.id,
-            'title': event.title,
+            'title': event.name,
             'description': event.description,
             'date': event.date.isoformat(),
-            'time': event.time.strftime('%H:%M'),
-            'location': event.location,
-            'max_students': event.max_students,
             'registered_count': registered_count,
             'is_registered': is_registered
         }
@@ -336,6 +321,254 @@ def api_students():
         })
     
     return students_data
+
+@app.route('/admin/create_sample_data', methods=['POST'])
+@login_required
+def create_sample_data_route():
+    if not current_user.is_admin:
+        flash('Unauthorized access')
+        return redirect(url_for('index'))
+    
+    try:
+        from werkzeug.security import generate_password_hash
+        import random
+        from datetime import timedelta
+        
+        # Create sample events
+        events = [
+            Event(
+                name="School Christmas Party",
+                date=datetime(2025, 12, 20, 18, 0),
+                description="Annual Christmas celebration with music, food, and fun activities."
+            ),
+            Event(
+                name="Science Fair",
+                date=datetime(2025, 11, 15, 13, 0),
+                description="Students present their science projects. Prizes for best projects!"
+            ),
+            Event(
+                name="Sports Day",
+                date=datetime(2025, 10, 25, 9, 0),
+                description="Annual sports competition with various athletic events and team games."
+            )
+        ]
+        
+        for event in events:
+            db.session.add(event)
+        db.session.commit()
+
+        # Create sample students
+        students = [
+            "Anna Novotná", "Jan Svoboda", "Marie Dvořáková",
+            "Petr Novák", "Tereza Černá", "Tomáš Procházka",
+            "Lucie Kučerová", "Jakub Veselý", "Karolína Horáková", "David Král"
+        ]
+
+        for student_name in students:
+            username = student_name.lower().replace(' ', '').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ý', 'y').replace('ř', 'r').replace('š', 's').replace('ž', 'z').replace('ů', 'u').replace('ú', 'u').replace('ó', 'o').replace('č', 'c')
+            
+            if not User.query.filter_by(username=username).first():
+                student = User(
+                    username=username,
+                    password_hash=generate_password_hash('student123'),
+                    name=student_name,
+                    is_admin=False
+                )
+                db.session.add(student)
+        db.session.commit()
+
+        # Create random registrations
+        students = User.query.filter_by(is_admin=False).all()
+        events = Event.query.all()
+
+        for student in students:
+            for event in events:
+                if random.random() < 0.7:
+                    attended = random.random() < 0.8
+                    registration = Registration(
+                        user_id=student.id,
+                        event_id=event.id,
+                        attended=attended,
+                        registration_date=datetime.now() - timedelta(days=random.randint(1, 30))
+                    )
+                    db.session.add(registration)
+        
+        db.session.commit()
+        flash('Sample data created successfully!')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error creating sample data: {str(e)}')
+    
+    return redirect(url_for('index'))
+
+@app.route('/admin/create_previous_data', methods=['POST'])
+@login_required
+def create_previous_data_route():
+    if not current_user.is_admin:
+        flash('Unauthorized access')
+        return redirect(url_for('index'))
+    
+    try:
+        from werkzeug.security import generate_password_hash
+        import random
+        from datetime import timedelta
+        
+        past_events = [
+            {
+                "name": "Spring Concert 2025",
+                "date": datetime(2025, 5, 15, 17, 30),
+                "description": "Annual spring concert featuring student performances in choir and instrumental music."
+            },
+            {
+                "name": "Math Olympics",
+                "date": datetime(2025, 4, 20, 9, 0),
+                "description": "Mathematics competition with challenging problems and puzzles."
+            },
+            {
+                "name": "Career Day",
+                "date": datetime(2025, 3, 12, 10, 0),
+                "description": "Professional speakers sharing career insights and opportunities."
+            },
+            {
+                "name": "Art Exhibition",
+                "date": datetime(2025, 2, 28, 14, 0),
+                "description": "Showcase of student artwork from various mediums and styles."
+            },
+            {
+                "name": "Winter Sports Tournament",
+                "date": datetime(2025, 1, 25, 8, 30),
+                "description": "Indoor sports competition including basketball and volleyball."
+            },
+            {
+                "name": "Literature Festival",
+                "date": datetime(2024, 12, 10, 13, 0),
+                "description": "Celebration of reading and writing with author visits and workshops."
+            }
+        ]
+
+        db_events = []
+        for event_data in past_events:
+            event = Event(
+                name=event_data["name"],
+                date=event_data["date"],
+                description=event_data["description"]
+            )
+            db.session.add(event)
+            db_events.append(event)
+        db.session.commit()
+
+        students = User.query.filter_by(is_admin=False).all()
+        if not students:
+            student_names = [
+                "Eva Malá", "Martin Horák", "Zuzana Šimková",
+                "Filip Kovář", "Nina Benešová", "Ondřej Marek",
+                "Klára Říhová", "Adam Tichý", "Barbora Vávrová",
+                "Daniel Pospíšil", "Sofie Marková", "Matěj Kříž"
+            ]
+            
+            for name in student_names:
+                username = name.lower().replace(' ', '').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ý', 'y').replace('ř', 'r').replace('š', 's').replace('ž', 'z').replace('ů', 'u').replace('ú', 'u').replace('ó', 'o').replace('č', 'c')
+                student = User(
+                    username=username,
+                    password_hash=generate_password_hash('student123'),
+                    name=name,
+                    is_admin=False
+                )
+                db.session.add(student)
+                students.append(student)
+            db.session.commit()
+
+        for event in db_events:
+            if "Concert" in event.name or "Exhibition" in event.name:
+                num_registrations = random.randint(15, 20)
+            elif "Olympics" in event.name or "Tournament" in event.name:
+                num_registrations = random.randint(8, 12)
+            else:
+                num_registrations = random.randint(10, 15)
+
+            event_students = random.sample(students, min(num_registrations, len(students)))
+
+            for student in event_students:
+                attended = random.random() < (0.85 if "Olympics" not in event.name else 0.75)
+                
+                registration = Registration(
+                    user_id=student.id,
+                    event_id=event.id,
+                    attended=attended,
+                    registration_date=event.date - timedelta(days=random.randint(5, 20))
+                )
+                db.session.add(registration)
+        
+        db.session.commit()
+        flash('Previous sample data created successfully!')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error creating previous data: {str(e)}')
+    
+    return redirect(url_for('index'))
+
+@app.route('/admin/generate_events', methods=['POST'])
+@login_required
+def generate_events_route():
+    if not current_user.is_admin:
+        flash('Unauthorized access')
+        return redirect(url_for('index'))
+    
+    try:
+        import random
+        from datetime import timedelta
+        
+        # Generate new future event
+        event_types = [
+            ("Graduation Ceremony", "End of year graduation ceremony celebrating our students' achievements. Family and friends welcome!"),
+            ("Technology Workshop", "Hands-on workshop exploring latest technology trends and innovations."),
+            ("Drama Performance", "Student theatrical production showcasing dramatic talents."),
+            ("Field Trip", "Educational excursion to local museum and historical sites."),
+            ("Dance Competition", "Annual dance showcase with various styles and performances."),
+            ("Debate Tournament", "Inter-class debate competition on current events and social issues."),
+            ("Music Festival", "Multi-genre music festival featuring student bands and solo performers."),
+            ("Cooking Class", "Interactive culinary workshop learning international cuisines."),
+            ("Photography Exhibition", "Display of student photography from various themes and techniques."),
+            ("Environmental Day", "Activities focused on sustainability and environmental awareness.")
+        ]
+        
+        # Pick a random event type
+        event_name, event_desc = random.choice(event_types)
+        
+        # Generate a future date (1-6 months from now)
+        days_ahead = random.randint(30, 180)
+        event_date = datetime.now() + timedelta(days=days_ahead)
+        event_date = event_date.replace(hour=random.choice([9, 10, 13, 14, 15, 17, 18]), minute=random.choice([0, 30]))
+        
+        new_event = Event(
+            name=event_name,
+            date=event_date,
+            description=event_desc
+        )
+        
+        db.session.add(new_event)
+        db.session.commit()
+
+        # Add random registrations for existing students
+        students = User.query.filter_by(is_admin=False).all()
+        
+        for student in students:
+            if random.random() < 0.6:  # 60% chance of registering
+                registration = Registration(
+                    user_id=student.id,
+                    event_id=new_event.id,
+                    attended=False,
+                    registration_date=datetime.now()
+                )
+                db.session.add(registration)
+        
+        db.session.commit()
+        flash(f'Generated new event: {event_name}')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error generating event: {str(e)}')
+    
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     with app.app_context():

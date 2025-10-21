@@ -1,12 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="300">
+    <meta name="grammarly" content="false">
+    <meta name="grammarly-extension" content="false">
     <title>SPŠD školní akce - {% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='settings.css') }}">
+    <style>
+        /* Force remove all grammar/spell check decorations */
+        input, select, textarea, option, 
+        input *, select *, textarea *, option * {
+            text-decoration: none !important;
+            text-decoration-line: none !important;
+            text-decoration-style: none !important;
+            text-decoration-color: transparent !important;
+            -webkit-text-decoration: none !important;
+            -webkit-text-decoration-line: none !important;
+            -webkit-text-decoration-style: none !important;
+            -webkit-text-decoration-color: transparent !important;
+        }
+        
+        /* Disable Grammarly styles */
+        grammarly-extension,
+        grammarly-card {
+            display: none !important;
+        }
+    </style>
     <script>
         // Theme management
         function initTheme() {
@@ -27,6 +49,15 @@
             const button = document.getElementById('themeToggle');
             if (button) {
                 button.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+            }
+            // Update logo based on theme
+            const logo = document.querySelector('.brand-logo');
+            if (logo) {
+                if (theme === 'dark') {
+                    logo.src = '{{ url_for("static", filename="logo-dark.png") }}';
+                } else {
+                    logo.src = '{{ url_for("static", filename="logo.png") }}';
+                }
             }
         }
         
@@ -67,7 +98,11 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-brand"><a href="{{ url_for('index') }}">SPŠD školní akce</a></div>
+        <div class="nav-brand">
+            <a href="{{ url_for('index') }}" class="brand-link">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="SPŠD Logo" class="brand-logo">
+            </a>
+        </div>
         <div class="nav-links">
             <a href="{{ url_for('index') }}">Events</a>
             <a href="{{ url_for('students') }}">Students</a>
@@ -94,12 +129,22 @@
                         {% if current_user.is_admin %}
                             <div class="settings-section">
                                 <h4>Admin Settings</h4>
-                                <div class="deletion-controls-settings">
-                                    <label class="enable-deletion">
-                                        <input type="checkbox" id="enableDeletion" onchange="toggleDeletionButtons()">
-                                        Enable event deletion
-                                    </label>
-                                    <small class="warning-text-settings">⚠️ Deleting events will permanently remove all associated records.</small>
+                                <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <form action="{{ url_for('create_sample_data_route') }}" method="POST" style="margin: 0;">
+                                        <button type="submit" class="admin-data-btn" onclick="return confirm('Create sample data? This will add events and students.')">
+                                            📊 Create Sample Data
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('create_previous_data_route') }}" method="POST" style="margin: 0;">
+                                        <button type="submit" class="admin-data-btn" onclick="return confirm('Create previous sample data? This will add past events.')">
+                                            📅 Create Previous Sample Data
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('generate_events_route') }}" method="POST" style="margin: 0;">
+                                        <button type="submit" class="admin-data-btn" onclick="return confirm('Generate a new random event?')">
+                                            🎲 Generate Events
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         {% endif %}

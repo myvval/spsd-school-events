@@ -46,7 +46,7 @@ def create_sample_data():
         # Add students to database
         for student_name in students:
             # Create username from name
-            username = student_name.lower().replace(' ', '')
+            username = student_name.lower().replace(' ', '').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ý', 'y').replace('ř', 'r').replace('š', 's').replace('ž', 'z').replace('ů', 'u').replace('ú', 'u').replace('ó', 'o').replace('č', 'c')
             
             # Check if student already exists
             if not User.query.filter_by(username=username).first():

@@ -26,8 +26,7 @@ function EventsList() {
   const filterEvents = (eventsList) => {
     return eventsList.filter(event =>
       event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase())
+      event.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
 
@@ -67,17 +66,21 @@ function EventsList() {
             React.createElement('span', { className: 'icon' }, '📅'),
             React.createElement('span', null, new Date(event.date).toLocaleDateString('cs-CZ'))
           ),
-          React.createElement('div', { className: 'info-item' },
+          event.time && React.createElement('div', { className: 'info-item' },
             React.createElement('span', { className: 'icon' }, '⏰'),
             React.createElement('span', null, event.time)
           ),
-          React.createElement('div', { className: 'info-item' },
+          event.location && React.createElement('div', { className: 'info-item' },
             React.createElement('span', { className: 'icon' }, '📍'),
             React.createElement('span', null, event.location)
           ),
           React.createElement('div', { className: 'info-item' },
             React.createElement('span', { className: 'icon' }, '👥'),
-            React.createElement('span', null, `${event.registered_count}/${event.max_students} registrováno`)
+            React.createElement('span', null, 
+              event.max_students 
+                ? `${event.registered_count}/${event.max_students} registrováno`
+                : `${event.registered_count} registrováno`
+            )
           )
         )
       ),
@@ -118,13 +121,20 @@ function EventsList() {
   return React.createElement('div', { className: 'events-container' },
     React.createElement('div', { className: 'search-filter-bar' },
       React.createElement('div', { className: 'search-box' },
-        React.createElement('span', { className: 'search-icon' }, '🔍'),
         React.createElement('input', {
           type: 'text',
-          placeholder: 'Hledat akce podle názvu, popisu nebo místa...',
+          placeholder: 'Hledat akce...',
           value: searchTerm,
           onChange: (e) => setSearchTerm(e.target.value),
-          className: 'search-input'
+          className: 'search-input',
+          spellCheck: 'false',
+          autoComplete: 'off',
+          autoCorrect: 'off',
+          autoCapitalize: 'off',
+          'data-gramm': 'false',
+          'data-gramm_editor': 'false',
+          'data-enable-grammarly': 'false',
+          style: { paddingLeft: '2.5rem' }
         }),
         searchTerm && React.createElement('button', {
           className: 'clear-search',

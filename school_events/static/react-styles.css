@@ -53,14 +53,19 @@
     font-size: 1.2rem;
     pointer-events: none;
     line-height: 1;
+    z-index: 1;
 }
 
 .search-input {
     width: 100%;
-    padding: 0.875rem 3rem 0.875rem 3.5rem;
+    padding: 0.875rem 3rem 0.875rem 2.5rem !important;
     border: 2px solid var(--input-border);
     border-radius: 25px;
     background: var(--input-bg);
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-size: 16px 16px;
     color: var(--text-primary);
     font-size: 1rem;
     transition: all 0.3s ease;
@@ -70,7 +75,6 @@
 .search-input:focus {
     outline: none;
     border-color: var(--input-focus-border);
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .search-input::placeholder {
@@ -335,7 +339,8 @@
 
 /* Student Card */
 .student-card {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 1.25rem;
     padding: 1.5rem;
@@ -345,6 +350,7 @@
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     animation: fadeIn 0.5s ease-in;
+    width: 100%;
 }
 
 .student-card:hover {
@@ -371,7 +377,8 @@
 }
 
 .student-info {
-    flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .student-name {
@@ -417,12 +424,15 @@
     flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
 }
 
 .btn-small {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     white-space: nowrap;
+    min-width: auto;
+    display: inline-block;
 }
 
 .no-results {

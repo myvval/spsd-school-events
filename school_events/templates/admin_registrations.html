@@ -9,11 +9,11 @@
     <div class="search-bar">
         <form action="{{ url_for('admin_registrations') }}" method="get" class="filter-form" id="filterForm">
             <div class="filter-group">
-                <input type="text" name="query" placeholder="Search by student name..." value="{{ query }}" oninput="applyFilters()">
-                <select name="event" id="eventSelect" onchange="applyFilters()">
-                    <option value="">All Events</option>
+                <input type="text" name="query" placeholder="Hledat studenta..." value="{{ query }}" oninput="applyFilters()" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false" style="padding-left: 2.5rem !important;">
+                <select name="event" id="eventSelect" onchange="applyFilters()" spellcheck="false" data-gramm="false" data-gramm_editor="false" data-enable-grammarly="false">
+                    <option value="" spellcheck="false">All Events</option>
                     {% for event in events %}
-                        <option value="{{ event.id }}" {% if selected_event|string == event.id|string %}selected{% endif %}>
+                        <option value="{{ event.id }}" {% if selected_event|string == event.id|string %}selected{% endif %} spellcheck="false">
                             {{ event.name }} ({{ event.formatted_date }})
                         </option>
                     {% endfor %}
@@ -31,6 +31,50 @@
                 document.getElementById('filterForm').submit();
             }, 300);
         }
+        
+        // Aggressive grammar checking disable
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to remove grammar checking attributes
+            function disableGrammarCheck(element) {
+                element.setAttribute('spellcheck', 'false');
+                element.setAttribute('autocomplete', 'off');
+                element.setAttribute('autocorrect', 'off');
+                element.setAttribute('autocapitalize', 'off');
+                element.setAttribute('data-gramm', 'false');
+                element.setAttribute('data-gramm_editor', 'false');
+                element.setAttribute('data-enable-grammarly', 'false');
+                element.setAttribute('contenteditable', 'false');
+                element.removeAttribute('contenteditable');
+            }
+            
+            // Apply to all form elements
+            const elements = document.querySelectorAll('input, select, textarea, option');
+            elements.forEach(disableGrammarCheck);
+            
+            // Watch for dynamically added elements
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) {
+                            if (node.matches('input, select, textarea, option')) {
+                                disableGrammarCheck(node);
+                            }
+                            node.querySelectorAll('input, select, textarea, option').forEach(disableGrammarCheck);
+                        }
+                    });
+                });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            
+            // Remove Grammarly elements
+            setInterval(function() {
+                document.querySelectorAll('grammarly-extension, grammarly-card, [data-grammarly-part]').forEach(el => el.remove());
+            }, 100);
+        });
     </script>
 
     <div class="registrations-list">
