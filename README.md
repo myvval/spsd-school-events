@@ -59,28 +59,38 @@ A modern web application for managing school events, student registrations, and 
    pip install flask flask-login flask-sqlalchemy werkzeug
    ```
 
-4. **Initialize the database**
+4. **Configure admin credentials**
+   ```bash
+   # Copy the example config file
+   cp school_events/config.example.py school_events/config.py
+   
+   # Edit config.py and set your admin credentials
+   # ADMIN_USERNAME = 'your_admin_username'
+   # ADMIN_PASSWORD = 'your_secure_password'
+   ```
+
+5. **Initialize the database**
    ```bash
    python rebuild_db.py
    ```
 
-5. **Create an admin account**
+6. **Create an admin account**
    ```bash
    python create_admin.py
    ```
-   Follow the prompts to set admin username and password.
+   This will use the credentials from config.py
 
-6. **Generate sample data** (optional)
+7. **Generate sample data** (optional)
    ```bash
    python generate_events.py
    ```
 
-7. **Run the application**
+8. **Run the application**
    ```bash
    python app.py
    ```
 
-8. **Open in browser**
+9. **Open in browser**
    Navigate to `http://127.0.0.1:5000`
 
 ## 📁 Project Structure
