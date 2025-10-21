@@ -298,24 +298,14 @@ python create_admin.py
 - Check browser console for errors
 - Verify React CDN links in templates
 - Clear browser cache (Ctrl+Shift+R)
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
+- 
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 👥 Authors
 
-- **Jakub** - Initial work - [myvval](https://github.com/myvval)
+- **Jakub Suchánsky** - Initial work - [myvval](https://github.com/myvval)
 
 ## 🙏 Acknowledgments
 
@@ -324,11 +314,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - SQLAlchemy for database ORM
 - Font Awesome for icons (via emojis in this version)
 
-## 📧 Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Contact: jakub@spsd.cz
 
 ## 🔮 Future Enhancements
 
